@@ -1,0 +1,1197 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sp_rel_widget_clone">
+    <sp_rel_widget_clone action="DELETE">
+        <child display_value="Copy of Standard Ticket Tab">2b36132f972021106882b0efe153af42</child>
+        <cloned>2023-01-28 21:11:33</cloned>
+        <last_validated>2023-01-28 21:11:33</last_validated>
+        <parent display_value="Standard Ticket Tab">d1cfa4ea131d0810da297ad66144b091</parent>
+        <payload>&lt;?xml version="1.0" encoding="UTF-8"?&gt;&lt;sp_widget&gt;&lt;category&gt;sc&lt;/category&gt;&lt;client_script&gt;&lt;![CDATA[function(spUtil, $scope, $timeout, $window, $log) {
+	function isRefreshNeededForChanges(changes) {
+		var isNeeded = changes.length &gt; 0 &amp;&amp; !(
+			changes.length == 1 &amp;&amp; (
+				changes[0] == 'comments' || changes[0] == 'work_notes' || changes[0] == 'task_percent_complete'
+			)
+		);
+		return isNeeded;
+	}
+	var c = this;
+
+	c.KEYS = {
+		LEFT: 37,
+		RIGHT: 39
+	};
+	
+	//Click First visible Tab
+	function clickFirstVisibleTab() {
+		var uibTabs = $('#std-uib-tabset').children('ul');
+		var firstVisibleTab = uibTabs.children('.uib-vis-tab:first').find('&gt;a');
+			$timeout(function(){
+				firstVisibleTab[0].click();
+			});
+	}
+	//Click dropdown menuitem on pressing right from tabs
+	c.keyUpOnTabs = function(e) {
+		var uibTabs = $('#std-uib-tabset').children('ul');
+		if(e.keyCode == c.KEYS.RIGHT &amp;&amp; uibTabs &amp;&amp; uibTabs.children('.uib-vis-tab:not(.hide-item):last')[0] == e.currentTarget) {
+			var selectables = $('#dropDownMenu').find('.hide-item:last').next();
+			if (selectables &amp;&amp; selectables.length != 0) {
+				$timeout(function(){
+					selectables[0].click();
+				});
+			}
+			else
+				clickFirstVisibleTab();
+		}
+	}
+	
+	c.keyUpOnDropDown = function(e) {
+		var selectedMenuItem = $('#dropDownMenu').find('.tick-mark').parent();
+		if(e.keyCode == c.KEYS.RIGHT) {
+			var rightChild = getNextOrPrevChild(selectedMenuItem.next(), true); // Get next child of selected menu item
+			if (rightChild) {
+				$timeout(function(){
+					rightChild[0].click();
+				});
+			}
+			else
+				clickFirstVisibleTab(); // Move focus to first visible tab when no more menu Items present in dropdown
+		}
+		else if(e.keyCode == c.KEYS.LEFT) {
+			var leftChild =	getNextOrPrevChild(selectedMenuItem.prev(), false); // Get previous child of selected menu item
+			if (leftChild) {
+				$timeout(function(){
+					leftChild[0].click()
+				});
+			}
+		}
+	}
+	
+	function getNextOrPrevChild(child, right) {
+		if (right &amp;&amp; child &amp;&amp; child.next().length != 0 &amp;&amp; child[0].tagName != 'LI') // To handle if next child is tooltip
+			return child.next();
+		else if (!right &amp;&amp; child &amp;&amp; child.prev().length != 0 &amp;&amp; child[0].tagName != 'LI') // To handle if prev child is tooltip
+			return child.prev();
+		else if (child &amp;&amp; child.length != 0)
+			return child;
+	}
+	
+	var primaryWidth = 0;
+	$scope.selectedTab = null;
+
+	spUtil.recordWatch($scope, $scope.data.table, "sys_id=" + $scope.data.sys_id, function(name) {
+		if (isRefreshNeededForChanges(name.data.changes))
+			$scope.server.get().then(function(response) {
+				if (!_.isEqual($scope.data, response.data))
+					_.assign($scope.data, response.data);
+				
+				$timeout(function(){
+					doAdapt();
+					c.more_title = "${More_menu}";
+				}, 0);
+			});
+	});
+
+var doAdapt = function(isSelectedTabNotPrimary) {
+	if (!c.data.canRead &amp;&amp; c.data.tabs.length == 0)
+		return;
+	
+	var selectedTab = $scope.selectedTab;
+	var primaryItems = document.getElementsByClassName("uib-vis-tab");
+	var moreItems = document.getElementsByClassName("uib-more-tab");
+
+  // reveal all items for the calculation
+  Object.keys(primaryItems).forEach(function(item) {
+    primaryItems[item].classList.remove('hide-item');
+  });
+	
+  // hide items that won't fit in the Primary
+  var stopWidth = 0;
+	
+	if (document.getElementById("std-uib-tabset")) {
+		primaryWidth = document.getElementById("std-uib-tabset").offsetWidth;
+	}
+	var includeInMenuItem;
+	var actualPossibleWidth = primaryWidth;
+  Object.keys(primaryItems).forEach(function(item, i) {
+    primaryItems[item].id = 'uib-st-tab-' + c.data.tabs[i].order;
+    moreItems[item].id = 'uib-more-tab-' + c.data.tabs[i].order;
+    moreItems[item].children[0].setAttribute('role', "option");
+    if (primaryWidth &gt;= stopWidth + primaryItems[item].offsetWidth &amp;&amp; !includeInMenuItem) {
+			stopWidth += primaryItems[item].offsetWidth;
+			moreItems[item].classList.add('hide-item');
+			primaryItems[item].classList.remove('hide-item');
+    } else if(primaryItems[item] == primaryItems[primaryItems.length - 1]) {
+			document.getElementById("more-btn-text").style.maxWidth = (primaryItems[item - 1].offsetWidth + actualPossibleWidth) - stopWidth - 50 + 'px';
+			includeInMenuItem = true;
+			showItemInMenu(item - 1);
+			showItemInMenu(item);
+		} else if (actualPossibleWidth - stopWidth &lt; parseInt(window.getComputedStyle(document.getElementById("more-btn"), null).getPropertyValue('min-width'))) {
+			showItemInMenu(item - 1);
+		} else {
+			var moreBtnWidth = 124;
+			document.getElementById("more-btn-text").style.maxWidth = actualPossibleWidth - stopWidth - moreBtnWidth - 50 + 'px';
+			includeInMenuItem = true;
+			showItemInMenu(item);
+			}
+  });
+	
+	function showItemInMenu(index) {
+		primaryItems[index].classList.add('hide-item');
+		moreItems[index].classList.remove('hide-item');
+	}
+	// show the selected tab and remove from more after clicked
+	if (selectedTab &amp;&amp; document.getElementById('uib-st-tab-' + selectedTab.order)) {
+		var tabItem = document.getElementById('uib-st-tab-' + selectedTab.order);
+		var menuItem = document.getElementById('uib-more-tab-' + selectedTab.order);
+	
+		if (!menuItem.className.includes("hide-item")) { //If menu item is present in the dropdown and is the selectedTab
+			menuItem.children[0].classList.add("tick-mark");
+			menuItem.parentElement.setAttribute('aria-activedescendant', menuItem.id);
+			menuItem.children[0].setAttribute('aria-selected', true);
+			addSelected(menuItem); //Added for accessibilty
+		}
+		setTimeout(function(){
+			if (isSelectedTabNotPrimary) 
+				tabItem.children[0].click();
+		 }, 0);
+	}
+	$scope.showOrHideMoreButton(moreItems);	
+}
+
+// adapt on load
+$timeout(function(){ 
+	doAdapt();
+	c.more_title = "${More_menu}";
+}, 0);
+
+$window.addEventListener('load',function() {
+    // handle load event
+	doAdapt();
+	c.more_title = "${More_menu}";
+});
+
+var prevTab;
+function renameMoreTab(tabSelected) {
+	var moreBtn = document.getElementById("more-btn");
+	var selectedItem;
+	if (tabSelected)
+		selectedItem = document.getElementById('uib-more-tab-'+ tabSelected.order);
+	var menuItemHidden;
+	if (tabSelected &amp;&amp; selectedItem)
+		menuItemHidden = selectedItem.className.includes("hide-item");
+	if (moreBtn &amp;&amp; tabSelected &amp;&amp; !menuItemHidden) {
+		moreBtn.removeAttribute('tabindex'); //As menuitem is selected, now dropdown should appear in tabbing sequence
+		c.more_title = tabSelected.name;
+		if (!moreBtn.className.includes('active-dropdown'))
+			moreBtn.className += ' active-dropdown';
+	}
+	else if (moreBtn &amp;&amp; tabSelected &amp;&amp; menuItemHidden) {
+		c.more_title = "${More_menu}";
+		 $("#more-btn").removeClass("active-dropdown");
+		moreBtn.setAttribute('tabindex', '-1'); //Reset tabindex -1
+	}
+}
+window.addEventListener('resize', function() {
+	$timeout(function(){
+		doAdapt();
+		renameMoreTab($scope.selectedTab);
+	});
+	if (prevTab &amp;&amp; prevTab.childNodes[1])
+			prevTab.removeChild(prevTab.childNodes[1]);
+}) // adapt on window resize
+
+function doOperationOnPrevTab(prevTab) {
+	if (prevTab) { //Remove the above added attr from previous selected tab on change of selection
+		prevTab.setAttribute('aria-selected', false);
+		prevTab.classList.remove("tick-mark");
+		if (prevTab.childNodes[1])
+			prevTab.removeChild(prevTab.childNodes[1]);
+	}
+}
+
+function addSelected(menuItem) {// Add span for reading the selected menu item in dropdown
+    var textSpan = document.createElement("span");
+    textSpan.innerHTML = "${ Selected}";
+    textSpan.classList.add("sr-only");
+    menuItem.children[0].appendChild(textSpan);
+}
+
+$scope.tabSelectedInMore = function(tab) {
+	doOperationOnPrevTab(prevTab);
+	prevTab = document.getElementById('uib-more-tab-'+ tab.order).children[0];
+	$scope.selectedTab = tab;
+	renameMoreTab($scope.selectedTab);
+	doAdapt(true);
+	var moreBtn = document.getElementById("more-btn");
+	moreBtn.removeAttribute('tabindex'); //As menuitem is selected, now dropdown should appear in tabbing sequence
+	if (moreBtn)
+		moreBtn.focus();
+}
+
+$scope.onTabClick = function(tab) {
+	renameMoreTab(tab);
+	doOperationOnPrevTab(prevTab);
+	var selectedItem = document.getElementById('uib-more-tab-'+ tab.order);
+	if (selectedItem)
+		prevTab = selectedItem.children[0];
+	$scope.selectedTab = tab;
+	doAdapt();
+	$scope.$emit('sp.components.resize');
+	var moreDropdown = document.getElementById("moreDropdown");
+	if (moreDropdown) {
+		$('#moreDropdown').tooltip('hide');
+		if (moreDropdown.className.includes("open"))
+			moreDropdown.classList.remove('open');
+	}
+};
+	
+$scope.showOrHideMoreButton = function(moreItems) {
+	c.showMore = false;
+	//hide dropdown if no elements are present
+	Object.keys(moreItems).forEach(function(item) {
+		if (!moreItems[item].className.includes("hide-item"))
+				c.showMore = true;
+	});
+	}
+	
+	$scope.$on('dialog.upload_too_large.show', function(e){
+		$log.error($scope.data.largeAttachmentMsg);
+		spUtil.addErrorMessage($scope.data.largeAttachmentMsg);
+	});
+}]]&gt;&lt;/client_script&gt;&lt;controller_as&gt;c&lt;/controller_as&gt;&lt;css&gt;$background-primary: #fff !default;
+$font-size-base: 16px !default;
+$sp-space--xxs: 2px !default;
+.std-uib-tabset {
+  background: $background-primary;
+}
+.options-btn {
+    border:none;
+    background-image:none;
+    background-color:transparent;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+    color: $primary;
+    padding: 10px 10px !important;
+    font-size: $font-size-base;
+    white-space: nowrap;
+    min-width: 122px;
+}
+
+.arrow-icon {
+  padding-left: 5px;
+  font-size: 10px;
+}
+
+.buttontext {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.tick-mark:before {
+  content:  "\2713";
+  padding-right: 5px;
+  color: $primary;
+}
+
+.tick-mark:focus::before {
+  color: white;
+}
+
+.more-btn-flex {
+  display: inline-flex;
+}
+
+ .options-btn:focus {
+  border-radius: 3px;
+  border: $sp-space--xxs solid $primary;
+  text-align: center;
+  font-size: $font-size-base;
+  min-width: 122px;
+  text-decoration: underline;
+}
+
+.options-btn:hover {
+  background-color: $gray-lighter;
+  color: $primary;
+  border-bottom: 3px solid $nav-tabs-justified-link-border-color;
+  text-decoration: underline;
+}
+
+.active-dropdown {
+  border-bottom: 3px solid $primary !important;
+  color: $component-active-color;
+  background-color: transparent !important;
+}
+
+.active-dropdown:hover {
+  color: inherit;
+}
+
+.nav-tabs &amp;gt; li.active &amp;gt; a{
+  border: 0;
+  border-bottom: 3px solid $primary;
+  background-color: transparent;
+  font-weight: bold;
+}
+
+.nav-tabs{
+  border: 1px solid $nav-tabs-justified-link-border-color;
+  border-bottom: none;
+  border-radius: 3px 3px 0 0;
+}
+
+.nav-tabs &amp;gt; li &amp;gt; a {
+  border-radius: 0;
+  border: none;
+  min-width: 124px;
+  text-align: center;
+  font-size: $font-size-base;
+  margin: 0;
+}
+
+.nav-tabs &amp;gt; li.active &amp;gt; a:hover {
+  border: 0;
+  border-bottom: 3px solid $primary;
+  color: inherit;
+}
+
+.nav-tabs &amp;gt; li.active &amp;gt; a:focus {
+  border: 0;
+  border-bottom: 3px solid $primary;
+  color: inherit;
+}
+
+.nav-tabs &amp;gt; li &amp;gt; a:hover {
+  color: $primary;
+  border-bottom: 3px solid $nav-tabs-justified-link-border-color;
+}
+
+.uib-more-tab :focus {
+  background-color: $primary;
+  color: white
+} 
+
+.hide-item {
+    display: none;
+  }
+
+.glyphicon {
+   color : inherit;
+}
+
+@media(max-width: 767px) {
+  .nav-tabs &amp;gt; li &amp;gt; a {
+  	white-space: nowrap;
+  	overflow: hidden;
+  	text-overflow: ellipsis;
+	}
+  
+  .nav-tabs &amp;gt; li {
+	max-width : 124px;
+	}
+  
+  .dropdown-menu {
+    max-width : 248px;
+  }
+  
+  .dropdown-menu &amp;gt; li &amp;gt; a {
+  	white-space: nowrap;
+  	overflow: hidden;
+  	text-overflow: ellipsis;
+  }
+}&lt;/css&gt;&lt;data_table&gt;sp_instance&lt;/data_table&gt;&lt;demo_data/&gt;&lt;description/&gt;&lt;docs/&gt;&lt;field_list/&gt;&lt;has_preview&gt;false&lt;/has_preview&gt;&lt;id&gt;std_ticket_tab&lt;/id&gt;&lt;internal&gt;true&lt;/internal&gt;&lt;link&gt;&lt;![CDATA[function link(scope, element, attrs, controller) {  }]]&gt;&lt;/link&gt;&lt;name&gt;Standard Ticket Tab&lt;/name&gt;&lt;option_schema&gt;[{"name":"rich_text_editor","section":"other","label":"Enable Rich Text Editor","type":"boolean","default_value": "false"}, {"name":"at_mentions","section":"other","label":"Enable @ Mentions (works only when Rich Text Editor is enabled)","type":"boolean","default_value": "false"}]&lt;/option_schema&gt;&lt;public&gt;false&lt;/public&gt;&lt;roles&gt;snc_external,snc_internal&lt;/roles&gt;&lt;script&gt;&lt;![CDATA[(function() {
+	var tableName = $sp.getParameter('table');
+	var sysId = $sp.getParameter('sys_id');
+	var record = sn_std_tkt_api.TicketConfig.getTicketRecord(tableName, sysId); 
+
+	data.canRead = (record != null &amp;&amp; record.isValid() &amp;&amp; record.canRead());
+	if (!data.canRead)
+		return;
+	
+	if ($sp.getParameter('headless') == 'true')
+		data.headless = true;
+	else if ($sp.getParameter('headless') == 'false')
+		data.headless = false;
+	else if ($sp.getParameter('headless') == null)
+		data.headless = false;
+	else
+		return;
+
+	data.maxAttachmentSize = parseInt(gs.getProperty("com.glide.attachment.max_size", 1024));
+	if (isNaN(data.maxAttachmentSize))
+		data.maxAttachmentSize = 24;
+	data.largeAttachmentMsg = gs.getMessage("Attached files must be smaller than {0} MB - please try again", data.maxAttachmentSize);
+	
+	var urClosedState;
+	if (tableName == 'universal_request') {
+		urClosedState = (record.state == '7');
+		if (record.primary_task) {
+			var primary_table = record.primary_task.getRefRecord().getTableName();
+			record = sn_std_tkt_api.TicketConfig.getTicketRecord(primary_table, record.primary_task);
+			data.canRead = record != null &amp;&amp; record.isValid() &amp;&amp; record.canRead();
+			if (!data.canRead)
+				return;	
+		}	
+	}
+	else if (record.isValidField('universal_request') &amp;&amp; !record.universal_request.nil())
+		urClosedState = (record.universal_request.state == '7');
+
+	data.table = record.getTableName();
+	data.sys_id = record.getUniqueValue();
+	
+	var tabs = [];
+	var config = sn_std_tkt_api.TicketConfig.getConfig(data.table, record.sys_domain);
+	var isNonPrimary = ((record.isValidField('universal_request') &amp;&amp; !record.universal_request.nil()) &amp;&amp; (record.universal_request.primary_task != record.sys_id));
+	if (!config.tabs) {
+		var tab_1 = {
+			name: gs.getMessage('Activity'),
+			order: 0,
+			widget: $sp.getWidget('std_ticket_conversations', 
+														{sys_id: data.sys_id, 
+														 table:data.table,
+														 btnLabel: gs.getMessage('Post'),
+														 read_only: isNonPrimary || urClosedState,
+														 rich_text_editor: options.rich_text_editor,
+														 at_mentions: options.at_mentions
+														})
+		};
+		tabs.push(tab_1);
+		var tab_2 = {
+			name: gs.getMessage('Attachments'),
+			order: 1,
+			widget: $sp.getWidget('std_ticket_attachments', {record_id: data.sys_id,
+															record_table: data.table,
+															read_only: isNonPrimary || urClosedState
+															})
+		};
+		tabs.push(tab_2);
+	}
+	else {
+		config.tabs.forEach(function (tabConfig) {
+			var tab = {};
+			tab.name = tabConfig.name;
+			tab.type = tabConfig.type;
+			var condition = tabConfig.visible_condition;
+			var isAdvCondition = tabConfig.advanced;
+			var scriptCondition = tabConfig.visible_script;
+			
+			if (isAdvCondition) {
+				if (scriptCondition) {
+					var evaluator = new GlideScopedEvaluator();
+					var tagGR = sn_std_tkt_api.TicketConfig.getTicketRecord('ticket_tab_configuration', tabConfig.sys_id);
+					evaluator.putVariable('current', record);
+					evaluator.putVariable('answer', null);
+					var response = evaluator.evaluateScript(tagGR, 'script');
+					if (typeof response !== 'undefined' &amp;&amp; !(response == 'true' ||
+															response == true ||
+															response.answer ||
+															response.answer == 'true' ||
+															response.answer == true)) //either the script could return true, or set answer to true
+						 return;
+						 
+				}
+			}
+			else {
+				if (condition) {
+					if (!GlideFilter.checkRecord(record, condition))
+						return;
+				}
+			}
+			if (tabConfig.type == 'activity') {
+				tab.widget = $sp.getWidget('std_ticket_conversations', 
+																	 {sys_id: data.sys_id, 
+																		table: data.table,
+																		btnLabel: gs.getMessage('Post'),
+																		read_only: isNonPrimary || urClosedState,
+																		rich_text_editor: options.rich_text_editor,
+																		at_mentions: options.at_mentions
+																	 });
+			}
+			else if (tabConfig.type == 'attachments') {
+				tab.widget = $sp.getWidget('std_ticket_attachments', {record_id: data.sys_id,
+																	record_table: data.table,
+																	read_only: isNonPrimary || urClosedState
+																	});
+			}
+			else if (tabConfig.type == 'associated_requests') {
+				tab.widget = $sp.getWidget('my-requests-v2', {record_id: data.sys_id,
+																	record_table: data.table,
+																	is_associated_ticket_tab: true
+																	});
+			}
+			else if (tabConfig.type == 'variable_editor' || tabConfig.type == 'variable_summary') {
+				if (record.variables.getElements(true).length == 0)
+					return;
+				
+				var widgetParam = tabConfig.widget_param;
+				if (widgetParam)
+					widgetParam = JSON.parse(widgetParam)
+				else
+					widgetParam = {};
+				widgetParam.table = data.table;
+				widgetParam.sys_id = data.sys_id;
+				tab.widget = $sp.getWidget(tabConfig.widget, widgetParam);
+			}
+
+			else if (tabConfig.type == 'custom') {
+				var widgetParam = tabConfig.widget_param;
+				if (widgetParam)
+					widgetParam = JSON.parse(widgetParam)
+				else
+					widgetParam = {};
+				widgetParam.table = data.table;
+				widgetParam.sys_id = data.sys_id;
+				widgetParam.read_only = isNonPrimary || urClosedState;
+				tab.widget = $sp.getWidget(tabConfig.widget, widgetParam);
+			}
+			else if (tabConfig.type == 'iar_recommendations') {
+				tab.widget = $sp.getWidget('iar_recommendation', {record_id: data.sys_id, record_table: data.table });
+			}
+			tab.order = tabConfig.order;
+			tabs.push(tab);
+		});
+	}
+	data.tabs = tabs;
+})();]]&gt;&lt;/script&gt;&lt;servicenow&gt;true&lt;/servicenow&gt;&lt;sys_class_name&gt;sp_widget&lt;/sys_class_name&gt;&lt;sys_created_by&gt;admin&lt;/sys_created_by&gt;&lt;sys_created_on&gt;2019-11-26 12:10:28&lt;/sys_created_on&gt;&lt;sys_id&gt;d1cfa4ea131d0810da297ad66144b091&lt;/sys_id&gt;&lt;sys_mod_count&gt;94&lt;/sys_mod_count&gt;&lt;sys_name&gt;Standard Ticket Tab&lt;/sys_name&gt;&lt;sys_package display_value="Service Portal - Standard Ticket" source="sn_std_tkt"&gt;c9f1df5787f50010e0ef0cf888cb0b2c&lt;/sys_package&gt;&lt;sys_policy/&gt;&lt;sys_scope display_value="Service Portal - Standard Ticket"&gt;c9f1df5787f50010e0ef0cf888cb0b2c&lt;/sys_scope&gt;&lt;sys_update_name&gt;sp_widget_d1cfa4ea131d0810da297ad66144b091&lt;/sys_update_name&gt;&lt;sys_updated_by&gt;maint&lt;/sys_updated_by&gt;&lt;sys_updated_on&gt;2022-03-15 04:17:19&lt;/sys_updated_on&gt;&lt;template&gt;&lt;![CDATA[&lt;uib-tabset ng-if="data.canRead &amp;&amp; data.tabs.length &gt; 0" id="std-uib-tabset" class="std-uib-tabset"&gt;
+  &lt;uib-tab class= "uib-vis-tab" ng-repeat="tab in data.tabs" index="$index" heading="{{tab.name}}" ng-click="$event.stopPropagation();onTabClick(tab)" title="{{tab.name}}" ng-keyup="c.keyUpOnTabs($event)" add-uib-tab-accessibility&gt;
+    &lt;div ng-class="{'panel b wrapper': tab.type != 'activity' &amp;&amp; tab.type != 'attachments'}"&gt;
+    	&lt;sp-widget widget= "tab.widget" page="{table:data.table, sys_id:data.sys_id}"&gt;&lt;/sp-widget&gt;  
+    &lt;/div&gt;
+  &lt;/uib-tab&gt;
+  &lt;li ng-if="data.canRead" class="nav-item dropdown" id="moreDropdown" ng-class="{'hide-item': !c.showMore}" data-toggle="tooltip" title="{{c.more_title}}" data-original-title="{{c.more_title}}"&gt;
+    &lt;button id="more-btn" class="options-btn pull-left nav-link dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" ng-keyup="c.keyUpOnDropDown($event)" tabindex="-1"&gt;
+          &lt;span class="more-btn-flex"&gt;
+            &lt;span class="buttontext" id="more-btn-text"&gt;{{c.more_title}}&lt;/span&gt;
+      &lt;/span&gt;
+          &lt;span class="arrow-icon glyphicon glyphicon-chevron-down"&gt;&lt;/span&gt;
+    &lt;/button&gt;
+     &lt;div class="dropdown-menu pull-right" id="dropDownMenu" role="listbox"&gt;
+        &lt;uib-tab class="uib-more-tab" ng-repeat="tab in data.tabs" heading="{{tab.name}}" id="{{tab.name}}" ng-click="$event.stopPropagation();tabSelectedInMore(tab)" data-toggle="tooltip" title="{{tab.name}}"&gt;
+  &lt;/uib-tab&gt;
+    &lt;/div&gt; 
+  &lt;/li&gt;
+&lt;/uib-tabset&gt;]]&gt;&lt;/template&gt;&lt;/sp_widget&gt;</payload>
+        <sys_class_name>sp_rel_widget_clone</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2023-01-28 21:11:33</sys_created_on>
+        <sys_id>e336132f972021106882b0efe153af48</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>2b36132f972021106882b0efe153af42</sys_name>
+        <sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
+        <sys_update_name>sp_rel_widget_clone_e336132f972021106882b0efe153af48</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2023-01-28 21:11:33</sys_updated_on>
+    </sp_rel_widget_clone>
+    <sys_update_version action="INSERT_OR_UPDATE">
+        <action>DELETE</action>
+        <application display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</application>
+        <file_path/>
+        <instance_id>32f05917db7d609052dd2f17d4961924</instance_id>
+        <instance_name>dev105920</instance_name>
+        <name>sp_rel_widget_clone_e336132f972021106882b0efe153af48</name>
+        <payload><![CDATA[<?xml version="1.0" encoding="UTF-8"?><record_update table="sp_rel_widget_clone"><sp_rel_widget_clone action="INSERT_OR_UPDATE"><child display_value="Copy of Standard Ticket Tab">2b36132f972021106882b0efe153af42</child><cloned>2023-01-28 21:11:33</cloned><last_validated>2023-01-28 21:11:33</last_validated><parent display_value="Standard Ticket Tab">d1cfa4ea131d0810da297ad66144b091</parent><payload>&lt;?xml version="1.0" encoding="UTF-8"?&gt;&lt;sp_widget&gt;&lt;category&gt;sc&lt;/category&gt;&lt;client_script&gt;&lt;![CDATA[function(spUtil, $scope, $timeout, $window, $log) {
+	function isRefreshNeededForChanges(changes) {
+		var isNeeded = changes.length &gt; 0 &amp;&amp; !(
+			changes.length == 1 &amp;&amp; (
+				changes[0] == 'comments' || changes[0] == 'work_notes' || changes[0] == 'task_percent_complete'
+			)
+		);
+		return isNeeded;
+	}
+	var c = this;
+
+	c.KEYS = {
+		LEFT: 37,
+		RIGHT: 39
+	};
+	
+	//Click First visible Tab
+	function clickFirstVisibleTab() {
+		var uibTabs = $('#std-uib-tabset').children('ul');
+		var firstVisibleTab = uibTabs.children('.uib-vis-tab:first').find('&gt;a');
+			$timeout(function(){
+				firstVisibleTab[0].click();
+			});
+	}
+	//Click dropdown menuitem on pressing right from tabs
+	c.keyUpOnTabs = function(e) {
+		var uibTabs = $('#std-uib-tabset').children('ul');
+		if(e.keyCode == c.KEYS.RIGHT &amp;&amp; uibTabs &amp;&amp; uibTabs.children('.uib-vis-tab:not(.hide-item):last')[0] == e.currentTarget) {
+			var selectables = $('#dropDownMenu').find('.hide-item:last').next();
+			if (selectables &amp;&amp; selectables.length != 0) {
+				$timeout(function(){
+					selectables[0].click();
+				});
+			}
+			else
+				clickFirstVisibleTab();
+		}
+	}
+	
+	c.keyUpOnDropDown = function(e) {
+		var selectedMenuItem = $('#dropDownMenu').find('.tick-mark').parent();
+		if(e.keyCode == c.KEYS.RIGHT) {
+			var rightChild = getNextOrPrevChild(selectedMenuItem.next(), true); // Get next child of selected menu item
+			if (rightChild) {
+				$timeout(function(){
+					rightChild[0].click();
+				});
+			}
+			else
+				clickFirstVisibleTab(); // Move focus to first visible tab when no more menu Items present in dropdown
+		}
+		else if(e.keyCode == c.KEYS.LEFT) {
+			var leftChild =	getNextOrPrevChild(selectedMenuItem.prev(), false); // Get previous child of selected menu item
+			if (leftChild) {
+				$timeout(function(){
+					leftChild[0].click()
+				});
+			}
+		}
+	}
+	
+	function getNextOrPrevChild(child, right) {
+		if (right &amp;&amp; child &amp;&amp; child.next().length != 0 &amp;&amp; child[0].tagName != 'LI') // To handle if next child is tooltip
+			return child.next();
+		else if (!right &amp;&amp; child &amp;&amp; child.prev().length != 0 &amp;&amp; child[0].tagName != 'LI') // To handle if prev child is tooltip
+			return child.prev();
+		else if (child &amp;&amp; child.length != 0)
+			return child;
+	}
+	
+	var primaryWidth = 0;
+	$scope.selectedTab = null;
+
+	spUtil.recordWatch($scope, $scope.data.table, "sys_id=" + $scope.data.sys_id, function(name) {
+		if (isRefreshNeededForChanges(name.data.changes))
+			$scope.server.get().then(function(response) {
+				if (!_.isEqual($scope.data, response.data))
+					_.assign($scope.data, response.data);
+				
+				$timeout(function(){
+					doAdapt();
+					c.more_title = "${More_menu}";
+				}, 0);
+			});
+	});
+
+var doAdapt = function(isSelectedTabNotPrimary) {
+	if (!c.data.canRead &amp;&amp; c.data.tabs.length == 0)
+		return;
+	
+	var selectedTab = $scope.selectedTab;
+	var primaryItems = document.getElementsByClassName("uib-vis-tab");
+	var moreItems = document.getElementsByClassName("uib-more-tab");
+
+  // reveal all items for the calculation
+  Object.keys(primaryItems).forEach(function(item) {
+    primaryItems[item].classList.remove('hide-item');
+  });
+	
+  // hide items that won't fit in the Primary
+  var stopWidth = 0;
+	
+	if (document.getElementById("std-uib-tabset")) {
+		primaryWidth = document.getElementById("std-uib-tabset").offsetWidth;
+	}
+	var includeInMenuItem;
+	var actualPossibleWidth = primaryWidth;
+  Object.keys(primaryItems).forEach(function(item, i) {
+    primaryItems[item].id = 'uib-st-tab-' + c.data.tabs[i].order;
+    moreItems[item].id = 'uib-more-tab-' + c.data.tabs[i].order;
+    moreItems[item].children[0].setAttribute('role', "option");
+    if (primaryWidth &gt;= stopWidth + primaryItems[item].offsetWidth &amp;&amp; !includeInMenuItem) {
+			stopWidth += primaryItems[item].offsetWidth;
+			moreItems[item].classList.add('hide-item');
+			primaryItems[item].classList.remove('hide-item');
+    } else if(primaryItems[item] == primaryItems[primaryItems.length - 1]) {
+			document.getElementById("more-btn-text").style.maxWidth = (primaryItems[item - 1].offsetWidth + actualPossibleWidth) - stopWidth - 50 + 'px';
+			includeInMenuItem = true;
+			showItemInMenu(item - 1);
+			showItemInMenu(item);
+		} else if (actualPossibleWidth - stopWidth &lt; parseInt(window.getComputedStyle(document.getElementById("more-btn"), null).getPropertyValue('min-width'))) {
+			showItemInMenu(item - 1);
+		} else {
+			var moreBtnWidth = 124;
+			document.getElementById("more-btn-text").style.maxWidth = actualPossibleWidth - stopWidth - moreBtnWidth - 50 + 'px';
+			includeInMenuItem = true;
+			showItemInMenu(item);
+			}
+  });
+	
+	function showItemInMenu(index) {
+		primaryItems[index].classList.add('hide-item');
+		moreItems[index].classList.remove('hide-item');
+	}
+	// show the selected tab and remove from more after clicked
+	if (selectedTab &amp;&amp; document.getElementById('uib-st-tab-' + selectedTab.order)) {
+		var tabItem = document.getElementById('uib-st-tab-' + selectedTab.order);
+		var menuItem = document.getElementById('uib-more-tab-' + selectedTab.order);
+	
+		if (!menuItem.className.includes("hide-item")) { //If menu item is present in the dropdown and is the selectedTab
+			menuItem.children[0].classList.add("tick-mark");
+			menuItem.parentElement.setAttribute('aria-activedescendant', menuItem.id);
+			menuItem.children[0].setAttribute('aria-selected', true);
+			addSelected(menuItem); //Added for accessibilty
+		}
+		setTimeout(function(){
+			if (isSelectedTabNotPrimary) 
+				tabItem.children[0].click();
+		 }, 0);
+	}
+	$scope.showOrHideMoreButton(moreItems);	
+}
+
+// adapt on load
+$timeout(function(){ 
+	doAdapt();
+	c.more_title = "${More_menu}";
+}, 0);
+
+$window.addEventListener('load',function() {
+    // handle load event
+	doAdapt();
+	c.more_title = "${More_menu}";
+});
+
+var prevTab;
+function renameMoreTab(tabSelected) {
+	var moreBtn = document.getElementById("more-btn");
+	var selectedItem;
+	if (tabSelected)
+		selectedItem = document.getElementById('uib-more-tab-'+ tabSelected.order);
+	var menuItemHidden;
+	if (tabSelected &amp;&amp; selectedItem)
+		menuItemHidden = selectedItem.className.includes("hide-item");
+	if (moreBtn &amp;&amp; tabSelected &amp;&amp; !menuItemHidden) {
+		moreBtn.removeAttribute('tabindex'); //As menuitem is selected, now dropdown should appear in tabbing sequence
+		c.more_title = tabSelected.name;
+		if (!moreBtn.className.includes('active-dropdown'))
+			moreBtn.className += ' active-dropdown';
+	}
+	else if (moreBtn &amp;&amp; tabSelected &amp;&amp; menuItemHidden) {
+		c.more_title = "${More_menu}";
+		 $("#more-btn").removeClass("active-dropdown");
+		moreBtn.setAttribute('tabindex', '-1'); //Reset tabindex -1
+	}
+}
+window.addEventListener('resize', function() {
+	$timeout(function(){
+		doAdapt();
+		renameMoreTab($scope.selectedTab);
+	});
+	if (prevTab &amp;&amp; prevTab.childNodes[1])
+			prevTab.removeChild(prevTab.childNodes[1]);
+}) // adapt on window resize
+
+function doOperationOnPrevTab(prevTab) {
+	if (prevTab) { //Remove the above added attr from previous selected tab on change of selection
+		prevTab.setAttribute('aria-selected', false);
+		prevTab.classList.remove("tick-mark");
+		if (prevTab.childNodes[1])
+			prevTab.removeChild(prevTab.childNodes[1]);
+	}
+}
+
+function addSelected(menuItem) {// Add span for reading the selected menu item in dropdown
+    var textSpan = document.createElement("span");
+    textSpan.innerHTML = "${ Selected}";
+    textSpan.classList.add("sr-only");
+    menuItem.children[0].appendChild(textSpan);
+}
+
+$scope.tabSelectedInMore = function(tab) {
+	doOperationOnPrevTab(prevTab);
+	prevTab = document.getElementById('uib-more-tab-'+ tab.order).children[0];
+	$scope.selectedTab = tab;
+	renameMoreTab($scope.selectedTab);
+	doAdapt(true);
+	var moreBtn = document.getElementById("more-btn");
+	moreBtn.removeAttribute('tabindex'); //As menuitem is selected, now dropdown should appear in tabbing sequence
+	if (moreBtn)
+		moreBtn.focus();
+}
+
+$scope.onTabClick = function(tab) {
+	renameMoreTab(tab);
+	doOperationOnPrevTab(prevTab);
+	var selectedItem = document.getElementById('uib-more-tab-'+ tab.order);
+	if (selectedItem)
+		prevTab = selectedItem.children[0];
+	$scope.selectedTab = tab;
+	doAdapt();
+	$scope.$emit('sp.components.resize');
+	var moreDropdown = document.getElementById("moreDropdown");
+	if (moreDropdown) {
+		$('#moreDropdown').tooltip('hide');
+		if (moreDropdown.className.includes("open"))
+			moreDropdown.classList.remove('open');
+	}
+};
+	
+$scope.showOrHideMoreButton = function(moreItems) {
+	c.showMore = false;
+	//hide dropdown if no elements are present
+	Object.keys(moreItems).forEach(function(item) {
+		if (!moreItems[item].className.includes("hide-item"))
+				c.showMore = true;
+	});
+	}
+	
+	$scope.$on('dialog.upload_too_large.show', function(e){
+		$log.error($scope.data.largeAttachmentMsg);
+		spUtil.addErrorMessage($scope.data.largeAttachmentMsg);
+	});
+}]]&gt;&lt;/client_script&gt;&lt;controller_as&gt;c&lt;/controller_as&gt;&lt;css&gt;$background-primary: #fff !default;
+$font-size-base: 16px !default;
+$sp-space--xxs: 2px !default;
+.std-uib-tabset {
+  background: $background-primary;
+}
+.options-btn {
+    border:none;
+    background-image:none;
+    background-color:transparent;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+    color: $primary;
+    padding: 10px 10px !important;
+    font-size: $font-size-base;
+    white-space: nowrap;
+    min-width: 122px;
+}
+
+.arrow-icon {
+  padding-left: 5px;
+  font-size: 10px;
+}
+
+.buttontext {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.tick-mark:before {
+  content:  "\2713";
+  padding-right: 5px;
+  color: $primary;
+}
+
+.tick-mark:focus::before {
+  color: white;
+}
+
+.more-btn-flex {
+  display: inline-flex;
+}
+
+ .options-btn:focus {
+  border-radius: 3px;
+  border: $sp-space--xxs solid $primary;
+  text-align: center;
+  font-size: $font-size-base;
+  min-width: 122px;
+  text-decoration: underline;
+}
+
+.options-btn:hover {
+  background-color: $gray-lighter;
+  color: $primary;
+  border-bottom: 3px solid $nav-tabs-justified-link-border-color;
+  text-decoration: underline;
+}
+
+.active-dropdown {
+  border-bottom: 3px solid $primary !important;
+  color: $component-active-color;
+  background-color: transparent !important;
+}
+
+.active-dropdown:hover {
+  color: inherit;
+}
+
+.nav-tabs &amp;gt; li.active &amp;gt; a{
+  border: 0;
+  border-bottom: 3px solid $primary;
+  background-color: transparent;
+  font-weight: bold;
+}
+
+.nav-tabs{
+  border: 1px solid $nav-tabs-justified-link-border-color;
+  border-bottom: none;
+  border-radius: 3px 3px 0 0;
+}
+
+.nav-tabs &amp;gt; li &amp;gt; a {
+  border-radius: 0;
+  border: none;
+  min-width: 124px;
+  text-align: center;
+  font-size: $font-size-base;
+  margin: 0;
+}
+
+.nav-tabs &amp;gt; li.active &amp;gt; a:hover {
+  border: 0;
+  border-bottom: 3px solid $primary;
+  color: inherit;
+}
+
+.nav-tabs &amp;gt; li.active &amp;gt; a:focus {
+  border: 0;
+  border-bottom: 3px solid $primary;
+  color: inherit;
+}
+
+.nav-tabs &amp;gt; li &amp;gt; a:hover {
+  color: $primary;
+  border-bottom: 3px solid $nav-tabs-justified-link-border-color;
+}
+
+.uib-more-tab :focus {
+  background-color: $primary;
+  color: white
+} 
+
+.hide-item {
+    display: none;
+  }
+
+.glyphicon {
+   color : inherit;
+}
+
+@media(max-width: 767px) {
+  .nav-tabs &amp;gt; li &amp;gt; a {
+  	white-space: nowrap;
+  	overflow: hidden;
+  	text-overflow: ellipsis;
+	}
+  
+  .nav-tabs &amp;gt; li {
+	max-width : 124px;
+	}
+  
+  .dropdown-menu {
+    max-width : 248px;
+  }
+  
+  .dropdown-menu &amp;gt; li &amp;gt; a {
+  	white-space: nowrap;
+  	overflow: hidden;
+  	text-overflow: ellipsis;
+  }
+}&lt;/css&gt;&lt;data_table&gt;sp_instance&lt;/data_table&gt;&lt;demo_data/&gt;&lt;description/&gt;&lt;docs/&gt;&lt;field_list/&gt;&lt;has_preview&gt;false&lt;/has_preview&gt;&lt;id&gt;std_ticket_tab&lt;/id&gt;&lt;internal&gt;true&lt;/internal&gt;&lt;link&gt;&lt;![CDATA[function link(scope, element, attrs, controller) {  }]]&gt;&lt;/link&gt;&lt;name&gt;Standard Ticket Tab&lt;/name&gt;&lt;option_schema&gt;[{"name":"rich_text_editor","section":"other","label":"Enable Rich Text Editor","type":"boolean","default_value": "false"}, {"name":"at_mentions","section":"other","label":"Enable @ Mentions (works only when Rich Text Editor is enabled)","type":"boolean","default_value": "false"}]&lt;/option_schema&gt;&lt;public&gt;false&lt;/public&gt;&lt;roles&gt;snc_external,snc_internal&lt;/roles&gt;&lt;script&gt;&lt;![CDATA[(function() {
+	var tableName = $sp.getParameter('table');
+	var sysId = $sp.getParameter('sys_id');
+	var record = sn_std_tkt_api.TicketConfig.getTicketRecord(tableName, sysId); 
+
+	data.canRead = (record != null &amp;&amp; record.isValid() &amp;&amp; record.canRead());
+	if (!data.canRead)
+		return;
+	
+	if ($sp.getParameter('headless') == 'true')
+		data.headless = true;
+	else if ($sp.getParameter('headless') == 'false')
+		data.headless = false;
+	else if ($sp.getParameter('headless') == null)
+		data.headless = false;
+	else
+		return;
+
+	data.maxAttachmentSize = parseInt(gs.getProperty("com.glide.attachment.max_size", 1024));
+	if (isNaN(data.maxAttachmentSize))
+		data.maxAttachmentSize = 24;
+	data.largeAttachmentMsg = gs.getMessage("Attached files must be smaller than {0} MB - please try again", data.maxAttachmentSize);
+	
+	var urClosedState;
+	if (tableName == 'universal_request') {
+		urClosedState = (record.state == '7');
+		if (record.primary_task) {
+			var primary_table = record.primary_task.getRefRecord().getTableName();
+			record = sn_std_tkt_api.TicketConfig.getTicketRecord(primary_table, record.primary_task);
+			data.canRead = record != null &amp;&amp; record.isValid() &amp;&amp; record.canRead();
+			if (!data.canRead)
+				return;	
+		}	
+	}
+	else if (record.isValidField('universal_request') &amp;&amp; !record.universal_request.nil())
+		urClosedState = (record.universal_request.state == '7');
+
+	data.table = record.getTableName();
+	data.sys_id = record.getUniqueValue();
+	
+	var tabs = [];
+	var config = sn_std_tkt_api.TicketConfig.getConfig(data.table, record.sys_domain);
+	var isNonPrimary = ((record.isValidField('universal_request') &amp;&amp; !record.universal_request.nil()) &amp;&amp; (record.universal_request.primary_task != record.sys_id));
+	if (!config.tabs) {
+		var tab_1 = {
+			name: gs.getMessage('Activity'),
+			order: 0,
+			widget: $sp.getWidget('std_ticket_conversations', 
+														{sys_id: data.sys_id, 
+														 table:data.table,
+														 btnLabel: gs.getMessage('Post'),
+														 read_only: isNonPrimary || urClosedState,
+														 rich_text_editor: options.rich_text_editor,
+														 at_mentions: options.at_mentions
+														})
+		};
+		tabs.push(tab_1);
+		var tab_2 = {
+			name: gs.getMessage('Attachments'),
+			order: 1,
+			widget: $sp.getWidget('std_ticket_attachments', {record_id: data.sys_id,
+															record_table: data.table,
+															read_only: isNonPrimary || urClosedState
+															})
+		};
+		tabs.push(tab_2);
+	}
+	else {
+		config.tabs.forEach(function (tabConfig) {
+			var tab = {};
+			tab.name = tabConfig.name;
+			tab.type = tabConfig.type;
+			var condition = tabConfig.visible_condition;
+			var isAdvCondition = tabConfig.advanced;
+			var scriptCondition = tabConfig.visible_script;
+			
+			if (isAdvCondition) {
+				if (scriptCondition) {
+					var evaluator = new GlideScopedEvaluator();
+					var tagGR = sn_std_tkt_api.TicketConfig.getTicketRecord('ticket_tab_configuration', tabConfig.sys_id);
+					evaluator.putVariable('current', record);
+					evaluator.putVariable('answer', null);
+					var response = evaluator.evaluateScript(tagGR, 'script');
+					if (typeof response !== 'undefined' &amp;&amp; !(response == 'true' ||
+															response == true ||
+															response.answer ||
+															response.answer == 'true' ||
+															response.answer == true)) //either the script could return true, or set answer to true
+						 return;
+						 
+				}
+			}
+			else {
+				if (condition) {
+					if (!GlideFilter.checkRecord(record, condition))
+						return;
+				}
+			}
+			if (tabConfig.type == 'activity') {
+				tab.widget = $sp.getWidget('std_ticket_conversations', 
+																	 {sys_id: data.sys_id, 
+																		table: data.table,
+																		btnLabel: gs.getMessage('Post'),
+																		read_only: isNonPrimary || urClosedState,
+																		rich_text_editor: options.rich_text_editor,
+																		at_mentions: options.at_mentions
+																	 });
+			}
+			else if (tabConfig.type == 'attachments') {
+				tab.widget = $sp.getWidget('std_ticket_attachments', {record_id: data.sys_id,
+																	record_table: data.table,
+																	read_only: isNonPrimary || urClosedState
+																	});
+			}
+			else if (tabConfig.type == 'associated_requests') {
+				tab.widget = $sp.getWidget('my-requests-v2', {record_id: data.sys_id,
+																	record_table: data.table,
+																	is_associated_ticket_tab: true
+																	});
+			}
+			else if (tabConfig.type == 'variable_editor' || tabConfig.type == 'variable_summary') {
+				if (record.variables.getElements(true).length == 0)
+					return;
+				
+				var widgetParam = tabConfig.widget_param;
+				if (widgetParam)
+					widgetParam = JSON.parse(widgetParam)
+				else
+					widgetParam = {};
+				widgetParam.table = data.table;
+				widgetParam.sys_id = data.sys_id;
+				tab.widget = $sp.getWidget(tabConfig.widget, widgetParam);
+			}
+
+			else if (tabConfig.type == 'custom') {
+				var widgetParam = tabConfig.widget_param;
+				if (widgetParam)
+					widgetParam = JSON.parse(widgetParam)
+				else
+					widgetParam = {};
+				widgetParam.table = data.table;
+				widgetParam.sys_id = data.sys_id;
+				widgetParam.read_only = isNonPrimary || urClosedState;
+				tab.widget = $sp.getWidget(tabConfig.widget, widgetParam);
+			}
+			else if (tabConfig.type == 'iar_recommendations') {
+				tab.widget = $sp.getWidget('iar_recommendation', {record_id: data.sys_id, record_table: data.table });
+			}
+			tab.order = tabConfig.order;
+			tabs.push(tab);
+		});
+	}
+	data.tabs = tabs;
+})();]]&gt;&lt;/script&gt;&lt;servicenow&gt;true&lt;/servicenow&gt;&lt;sys_class_name&gt;sp_widget&lt;/sys_class_name&gt;&lt;sys_created_by&gt;admin&lt;/sys_created_by&gt;&lt;sys_created_on&gt;2019-11-26 12:10:28&lt;/sys_created_on&gt;&lt;sys_id&gt;d1cfa4ea131d0810da297ad66144b091&lt;/sys_id&gt;&lt;sys_mod_count&gt;94&lt;/sys_mod_count&gt;&lt;sys_name&gt;Standard Ticket Tab&lt;/sys_name&gt;&lt;sys_package display_value="Service Portal - Standard Ticket" source="sn_std_tkt"&gt;c9f1df5787f50010e0ef0cf888cb0b2c&lt;/sys_package&gt;&lt;sys_policy/&gt;&lt;sys_scope display_value="Service Portal - Standard Ticket"&gt;c9f1df5787f50010e0ef0cf888cb0b2c&lt;/sys_scope&gt;&lt;sys_update_name&gt;sp_widget_d1cfa4ea131d0810da297ad66144b091&lt;/sys_update_name&gt;&lt;sys_updated_by&gt;maint&lt;/sys_updated_by&gt;&lt;sys_updated_on&gt;2022-03-15 04:17:19&lt;/sys_updated_on&gt;&lt;template&gt;&lt;![CDATA[&lt;uib-tabset ng-if="data.canRead &amp;&amp; data.tabs.length &gt; 0" id="std-uib-tabset" class="std-uib-tabset"&gt;
+  &lt;uib-tab class= "uib-vis-tab" ng-repeat="tab in data.tabs" index="$index" heading="{{tab.name}}" ng-click="$event.stopPropagation();onTabClick(tab)" title="{{tab.name}}" ng-keyup="c.keyUpOnTabs($event)" add-uib-tab-accessibility&gt;
+    &lt;div ng-class="{'panel b wrapper': tab.type != 'activity' &amp;&amp; tab.type != 'attachments'}"&gt;
+    	&lt;sp-widget widget= "tab.widget" page="{table:data.table, sys_id:data.sys_id}"&gt;&lt;/sp-widget&gt;  
+    &lt;/div&gt;
+  &lt;/uib-tab&gt;
+  &lt;li ng-if="data.canRead" class="nav-item dropdown" id="moreDropdown" ng-class="{'hide-item': !c.showMore}" data-toggle="tooltip" title="{{c.more_title}}" data-original-title="{{c.more_title}}"&gt;
+    &lt;button id="more-btn" class="options-btn pull-left nav-link dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" ng-keyup="c.keyUpOnDropDown($event)" tabindex="-1"&gt;
+          &lt;span class="more-btn-flex"&gt;
+            &lt;span class="buttontext" id="more-btn-text"&gt;{{c.more_title}}&lt;/span&gt;
+      &lt;/span&gt;
+          &lt;span class="arrow-icon glyphicon glyphicon-chevron-down"&gt;&lt;/span&gt;
+    &lt;/button&gt;
+     &lt;div class="dropdown-menu pull-right" id="dropDownMenu" role="listbox"&gt;
+        &lt;uib-tab class="uib-more-tab" ng-repeat="tab in data.tabs" heading="{{tab.name}}" id="{{tab.name}}" ng-click="$event.stopPropagation();tabSelectedInMore(tab)" data-toggle="tooltip" title="{{tab.name}}"&gt;
+  &lt;/uib-tab&gt;
+    &lt;/div&gt; 
+  &lt;/li&gt;
+&lt;/uib-tabset&gt;]]&gt;&lt;/template&gt;&lt;/sp_widget&gt;</payload><sys_class_name>sp_rel_widget_clone</sys_class_name><sys_created_by>admin</sys_created_by><sys_created_on>2023-01-28 21:11:33</sys_created_on><sys_id>e336132f972021106882b0efe153af48</sys_id><sys_mod_count>0</sys_mod_count><sys_name>2b36132f972021106882b0efe153af42</sys_name><sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package><sys_policy/><sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope><sys_update_name>sp_rel_widget_clone_e336132f972021106882b0efe153af48</sys_update_name><sys_updated_by>admin</sys_updated_by><sys_updated_on>2023-01-28 21:11:33</sys_updated_on></sp_rel_widget_clone></record_update>]]></payload>
+        <payload_hash>1478285930</payload_hash>
+        <record_name>2b36132f972021106882b0efe153af42</record_name>
+        <reverted_from/>
+        <source>70e87fb6976421106882b0efe153af14</source>
+        <source_table>sys_update_set</source_table>
+        <state>previous</state>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2023-01-28 21:11:33</sys_created_on>
+        <sys_id>6f36132f972021106882b0efe153af49</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_recorded_at>185fa389fbb0000001</sys_recorded_at>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2023-01-28 21:11:33</sys_updated_on>
+        <type>Widget Clone</type>
+        <update_guid>a736132f2d202110909c166ac68b3149</update_guid>
+        <update_guid_history>a736132f2d202110909c166ac68b3149:1478285930</update_guid_history>
+    </sys_update_version>
+    <sys_metadata_delete action="INSERT_OR_UPDATE">
+        <sys_audit_delete display_value="">a01917ef972021106882b0efe153af2f</sys_audit_delete>
+        <sys_class_name>sys_metadata_delete</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2023-01-28 21:23:54</sys_created_on>
+        <sys_db_object display_value="" name="sp_rel_widget_clone">sp_rel_widget_clone</sys_db_object>
+        <sys_id>6b7d05d7f17c40ec8c99ce9d90b2a084</sys_id>
+        <sys_metadata>e336132f972021106882b0efe153af48</sys_metadata>
+        <sys_name>2b36132f972021106882b0efe153af42</sys_name>
+        <sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package>
+        <sys_parent/>
+        <sys_policy/>
+        <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
+        <sys_scope_delete display_value="">94872a8897db403e8ee69a431de2fca4</sys_scope_delete>
+        <sys_update_name>sp_rel_widget_clone_e336132f972021106882b0efe153af48</sys_update_name>
+        <sys_update_version display_value="sp_rel_widget_clone_e336132f972021106882b0efe153af48">6f36132f972021106882b0efe153af49</sys_update_version>
+    </sys_metadata_delete>
+</record_update>

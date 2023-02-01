@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="m2m_sp_ng_pro_sp_widget">
+    <m2m_sp_ng_pro_sp_widget action="DELETE">
+        <sp_angular_provider display_value="addUibTabAccessibility">ba2c64e253022010bcd5ddeeff7b12b4</sp_angular_provider>
+        <sp_widget display_value="Copy of Standard Ticket Tab">2b36132f972021106882b0efe153af42</sp_widget>
+        <sys_class_name>m2m_sp_ng_pro_sp_widget</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2023-01-28 21:11:32</sys_created_on>
+        <sys_id>2736132f972021106882b0efe153af45</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>addUibTabAccessibility.Copy of Standard Ticket Tab</sys_name>
+        <sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
+        <sys_update_name>m2m_sp_ng_pro_sp_widget_2736132f972021106882b0efe153af45</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2023-01-28 21:11:32</sys_updated_on>
+    </m2m_sp_ng_pro_sp_widget>
+    <sys_update_version action="INSERT_OR_UPDATE">
+        <action>DELETE</action>
+        <application display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</application>
+        <file_path/>
+        <instance_id>32f05917db7d609052dd2f17d4961924</instance_id>
+        <instance_name>dev105920</instance_name>
+        <name>m2m_sp_ng_pro_sp_widget_2736132f972021106882b0efe153af45</name>
+        <payload><![CDATA[<?xml version="1.0" encoding="UTF-8"?><record_update table="m2m_sp_ng_pro_sp_widget"><m2m_sp_ng_pro_sp_widget action="INSERT_OR_UPDATE"><sp_angular_provider display_value="addUibTabAccessibility">ba2c64e253022010bcd5ddeeff7b12b4</sp_angular_provider><sp_widget display_value="Copy of Standard Ticket Tab">2b36132f972021106882b0efe153af42</sp_widget><sys_class_name>m2m_sp_ng_pro_sp_widget</sys_class_name><sys_created_by>admin</sys_created_by><sys_created_on>2023-01-28 21:11:32</sys_created_on><sys_id>2736132f972021106882b0efe153af45</sys_id><sys_mod_count>0</sys_mod_count><sys_name>addUibTabAccessibility.Copy of Standard Ticket Tab</sys_name><sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package><sys_policy/><sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope><sys_update_name>m2m_sp_ng_pro_sp_widget_2736132f972021106882b0efe153af45</sys_update_name><sys_updated_by>admin</sys_updated_by><sys_updated_on>2023-01-28 21:11:32</sys_updated_on></m2m_sp_ng_pro_sp_widget></record_update>]]></payload>
+        <payload_hash>1314194882</payload_hash>
+        <record_name>addUibTabAccessibility.Copy of Standard Ticket Tab</record_name>
+        <reverted_from/>
+        <source>70e87fb6976421106882b0efe153af14</source>
+        <source_table>sys_update_set</source_table>
+        <state>previous</state>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2023-01-28 21:11:33</sys_created_on>
+        <sys_id>2b36132f972021106882b0efe153af47</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_recorded_at>185fa389f870000001</sys_recorded_at>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2023-01-28 21:11:33</sys_updated_on>
+        <type>Angular Providers</type>
+        <update_guid>6336132f96202110e6ee66d014a84a47</update_guid>
+        <update_guid_history>6336132f96202110e6ee66d014a84a47:1314194882</update_guid_history>
+    </sys_update_version>
+    <sys_metadata_delete action="INSERT_OR_UPDATE">
+        <sys_audit_delete display_value="addUibTabAccessibility.Copy of Standard Ticket Tab">681917ef972021106882b0efe153af27</sys_audit_delete>
+        <sys_class_name>sys_metadata_delete</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2023-01-28 21:23:54</sys_created_on>
+        <sys_db_object display_value="" name="m2m_sp_ng_pro_sp_widget">m2m_sp_ng_pro_sp_widget</sys_db_object>
+        <sys_id>01aaa3d17f684d9a801bb92a8a8ac364</sys_id>
+        <sys_metadata>2736132f972021106882b0efe153af45</sys_metadata>
+        <sys_name>addUibTabAccessibility.Copy of Standard Ticket Tab</sys_name>
+        <sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package>
+        <sys_parent/>
+        <sys_policy/>
+        <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
+        <sys_scope_delete display_value="">94872a8897db403e8ee69a431de2fca4</sys_scope_delete>
+        <sys_update_name>m2m_sp_ng_pro_sp_widget_2736132f972021106882b0efe153af45</sys_update_name>
+        <sys_update_version display_value="m2m_sp_ng_pro_sp_widget_2736132f972021106882b0efe153af45">2b36132f972021106882b0efe153af47</sys_update_version>
+    </sys_metadata_delete>
+</record_update>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_ux_page_registry">
+    <sys_ux_page_registry action="DELETE">
+        <active>true</active>
+        <admin_panel>78b6fde4973021106882b0efe153af65</admin_panel>
+        <admin_panel_table>sys_ux_app_config</admin_panel_table>
+        <auth_routes/>
+        <page/>
+        <parent_app display_value="Unified Navigation app shell">c86a62e2c7022010099a308dc7c26022</parent_app>
+        <path>occasions</path>
+        <root_macroponent display_value="UXR Base Experience Shell">76a83a645b122010b913030a1d81c780</root_macroponent>
+        <sys_class_name>sys_ux_page_registry</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2023-01-31 16:48:03</sys_created_on>
+        <sys_id>38b6fde4973021106882b0efe153af68</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>Special Occasions web experience</sys_name>
+        <sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
+        <sys_update_name>sys_ux_page_registry_38b6fde4973021106882b0efe153af68</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2023-01-31 16:48:03</sys_updated_on>
+        <title>Special Occasions web experience</title>
+    </sys_ux_page_registry>
+    <sys_update_version action="INSERT_OR_UPDATE">
+        <action>DELETE</action>
+        <application display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</application>
+        <file_path/>
+        <instance_id>32f05917db7d609052dd2f17d4961924</instance_id>
+        <instance_name>dev105920</instance_name>
+        <name>sys_ux_page_registry_38b6fde4973021106882b0efe153af68</name>
+        <payload><![CDATA[<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_ux_page_registry"><sys_ux_page_registry action="INSERT_OR_UPDATE"><active>true</active><admin_panel>78b6fde4973021106882b0efe153af65</admin_panel><admin_panel_table>sys_ux_app_config</admin_panel_table><auth_routes/><page/><parent_app display_value="Unified Navigation app shell">c86a62e2c7022010099a308dc7c26022</parent_app><path>occasions</path><root_macroponent display_value="UXR Base Experience Shell">76a83a645b122010b913030a1d81c780</root_macroponent><sys_class_name>sys_ux_page_registry</sys_class_name><sys_created_by>admin</sys_created_by><sys_created_on>2023-01-31 16:48:03</sys_created_on><sys_id>38b6fde4973021106882b0efe153af68</sys_id><sys_mod_count>0</sys_mod_count><sys_name>Special Occasions web experience</sys_name><sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package><sys_policy/><sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope><sys_update_name>sys_ux_page_registry_38b6fde4973021106882b0efe153af68</sys_update_name><sys_updated_by>admin</sys_updated_by><sys_updated_on>2023-01-31 16:48:03</sys_updated_on><title>Special Occasions web experience</title></sys_ux_page_registry></record_update>]]></payload>
+        <payload_hash>1784466518</payload_hash>
+        <record_name>Special Occasions web experience</record_name>
+        <reverted_from/>
+        <source>70e87fb6976421106882b0efe153af14</source>
+        <source_table>sys_update_set</source_table>
+        <state>previous</state>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2023-01-31 16:48:03</sys_created_on>
+        <sys_id>70b6fde4973021106882b0efe153af6b</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_recorded_at>18608ba75e90000001</sys_recorded_at>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2023-01-31 16:48:03</sys_updated_on>
+        <type>UX Application</type>
+        <update_guid>b8b6fde4203021101b3ee196e45c0c6a</update_guid>
+        <update_guid_history>b8b6fde4203021101b3ee196e45c0c6a:1784466518</update_guid_history>
+    </sys_update_version>
+    <sys_metadata_delete action="INSERT_OR_UPDATE">
+        <sys_audit_delete/>
+        <sys_class_name>sys_metadata_delete</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2023-01-31 16:50:11</sys_created_on>
+        <sys_db_object display_value="" name="sys_ux_page_registry">sys_ux_page_registry</sys_db_object>
+        <sys_id>606ebefc7bc242d085b591828b499f10</sys_id>
+        <sys_metadata>38b6fde4973021106882b0efe153af68</sys_metadata>
+        <sys_name>Special Occasions web experience</sys_name>
+        <sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package>
+        <sys_parent/>
+        <sys_policy/>
+        <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
+        <sys_scope_delete display_value="">94872a8897db403e8ee69a431de2fca4</sys_scope_delete>
+        <sys_update_name>sys_ux_page_registry_38b6fde4973021106882b0efe153af68</sys_update_name>
+        <sys_update_version display_value="sys_ux_page_registry_38b6fde4973021106882b0efe153af68">70b6fde4973021106882b0efe153af6b</sys_update_version>
+    </sys_metadata_delete>
+</record_update>

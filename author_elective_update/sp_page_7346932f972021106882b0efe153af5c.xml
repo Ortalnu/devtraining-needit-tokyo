@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sp_page">
+    <sp_page action="DELETE">
+        <category>custom</category>
+        <css/>
+        <draft>false</draft>
+        <dynamic_title_structure>My Request - %title</dynamic_title_structure>
+        <id>copy_of_standard_ticket_1</id>
+        <internal>false</internal>
+        <omit_watcher>false</omit_watcher>
+        <public>false</public>
+        <roles>snc_external,snc_internal</roles>
+        <seo_script/>
+        <short_description/>
+        <sys_class_name>sp_page</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2023-01-28 21:11:50</sys_created_on>
+        <sys_id>7346932f972021106882b0efe153af5c</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>copy_of_standard_ticket_1</sys_name>
+        <sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
+        <sys_update_name>sp_page_7346932f972021106882b0efe153af5c</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2023-01-28 21:11:50</sys_updated_on>
+        <title>Copy of Standard Ticket (1)</title>
+        <use_seo_script>false</use_seo_script>
+    </sp_page>
+    <sys_translated_text action="DELETE" query="documentkey=7346932f972021106882b0efe153af5c"/>
+    <sys_update_version action="INSERT_OR_UPDATE">
+        <action>DELETE</action>
+        <application display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</application>
+        <file_path/>
+        <instance_id>32f05917db7d609052dd2f17d4961924</instance_id>
+        <instance_name>dev105920</instance_name>
+        <name>sp_page_7346932f972021106882b0efe153af5c</name>
+        <payload><![CDATA[<?xml version="1.0" encoding="UTF-8"?><record_update table="sp_page"><sp_page action="INSERT_OR_UPDATE"><category>custom</category><css/><draft>false</draft><dynamic_title_structure>My Request - %title</dynamic_title_structure><id>copy_of_standard_ticket_1</id><internal>false</internal><omit_watcher>false</omit_watcher><public>false</public><roles>snc_external,snc_internal</roles><seo_script/><short_description/><sys_class_name>sp_page</sys_class_name><sys_created_by>admin</sys_created_by><sys_created_on>2023-01-28 21:11:50</sys_created_on><sys_id>7346932f972021106882b0efe153af5c</sys_id><sys_mod_count>0</sys_mod_count><sys_name>copy_of_standard_ticket_1</sys_name><sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package><sys_policy/><sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope><sys_update_name>sp_page_7346932f972021106882b0efe153af5c</sys_update_name><sys_updated_by>admin</sys_updated_by><sys_updated_on>2023-01-28 21:11:50</sys_updated_on><title>Copy of Standard Ticket (1)</title><use_seo_script>false</use_seo_script></sp_page><sys_translated_text action="delete_multiple" query="documentkey=7346932f972021106882b0efe153af5c"/></record_update>]]></payload>
+        <payload_hash>347033989</payload_hash>
+        <record_name>copy_of_standard_ticket_1</record_name>
+        <reverted_from/>
+        <source>70e87fb6976421106882b0efe153af14</source>
+        <source_table>sys_update_set</source_table>
+        <state>previous</state>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2023-01-28 21:11:50</sys_created_on>
+        <sys_id>7346932f972021106882b0efe153af5f</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_recorded_at>185fa38e3130000001</sys_recorded_at>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2023-01-28 21:11:50</sys_updated_on>
+        <type>Page</type>
+        <update_guid>bb46932f5920211056faa87abd70a55e</update_guid>
+        <update_guid_history>bb46932f5920211056faa87abd70a55e:347033989</update_guid_history>
+    </sys_update_version>
+    <sys_metadata_delete action="INSERT_OR_UPDATE">
+        <sys_audit_delete display_value="copy_of_standard_ticket_1">3c2997ef972021106882b0efe153af13</sys_audit_delete>
+        <sys_class_name>sys_metadata_delete</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2023-01-28 21:24:11</sys_created_on>
+        <sys_db_object display_value="" name="sp_page">sp_page</sys_db_object>
+        <sys_id>6ea3681a47fa4aea8d4dd2565b73b8c4</sys_id>
+        <sys_metadata>7346932f972021106882b0efe153af5c</sys_metadata>
+        <sys_name>copy_of_standard_ticket_1</sys_name>
+        <sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package>
+        <sys_parent/>
+        <sys_policy/>
+        <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
+        <sys_scope_delete display_value="">94872a8897db403e8ee69a431de2fca4</sys_scope_delete>
+        <sys_update_name>sp_page_7346932f972021106882b0efe153af5c</sys_update_name>
+        <sys_update_version display_value="sp_page_7346932f972021106882b0efe153af5c">7346932f972021106882b0efe153af5f</sys_update_version>
+    </sys_metadata_delete>
+</record_update>
